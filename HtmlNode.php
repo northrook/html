@@ -78,7 +78,7 @@ readonly class HtmlNode
 
     public static function extractAttributes( string $html ) : array {
 
-        $html = Minify::HTML( $html )->toString();
+        $html = Minify::HTML( $html, false )->toString();
 
         if ( false === str_starts_with( $html, '<' ) && false === str_starts_with( $html, '>' ) ) {
             $html = "<div $html>";
