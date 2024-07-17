@@ -1,0 +1,29 @@
+{
+  "name": "northrook/html",
+  "description": "Generate HTML elements and attributes.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Martin",
+      "email": "mn@northrook.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Northrook\\HTML\\": ""
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=8.2",
+    "ext-dom": "*",
+    "ext-libxml": "*",
+    "northrook/core": "dev-main",
+    "northrook/minify": "dev-main"
+  },
+  "require-dev": {
+    "northrook/dev-env": "dev-main"
+  }
+}
