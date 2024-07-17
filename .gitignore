@@ -12,7 +12,7 @@
 .env
 *.lock
 /var/
-/*.php
+/index.php
 /*.twig
 /*.latte
 
