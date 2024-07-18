@@ -36,7 +36,7 @@ readonly class HtmlNode
     }
 
     public function loadHtml( string $string ) : void {
-        $html = Minify::HTML( $string )->toString();
+        $html = Minify::HTML( $string, false )->toString();
         $this->dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR );
     }
 
