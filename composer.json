@@ -21,6 +21,7 @@
     "ext-dom": "*",
     "ext-libxml": "*",
     "northrook/core": "dev-main",
+    "northrook/html-element": "dev-main",
     "northrook/minify": "dev-main"
   },
   "require-dev": {
