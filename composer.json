@@ -22,7 +22,8 @@
     "ext-libxml": "*",
     "northrook/core": "dev-main",
     "northrook/html-element": "dev-main",
-    "northrook/minify": "dev-main"
+    "northrook/minify": "dev-main",
+    "northrook/filesystem": "dev-main"
   },
   "require-dev": {
     "northrook/dev-env": "dev-main"
