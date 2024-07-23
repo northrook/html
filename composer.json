@@ -22,6 +22,7 @@
     "ext-libxml": "*",
     "northrook/core": "dev-main",
     "northrook/html-element": "dev-main",
+    "northrook/html-formatter": "dev-main",
     "northrook/minify": "dev-main",
     "northrook/filesystem": "dev-main"
   },
