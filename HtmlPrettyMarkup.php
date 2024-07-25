@@ -2,10 +2,10 @@
 
 namespace Northrook\HTML;
 
-use JetBrains\PhpStorm\Deprecated;
 use Northrook\Core\Interface\Printable;
-use Northrook\Support\Internal\Regex;
-use Northrook\Support\Str;
+use function Northrook\arrayAsObject;
+use function Northrook\replaceEach;
+use function Northrook\squish;
 
 class HtmlPrettyMarkup implements Printable
 {
@@ -265,12 +265,53 @@ class HtmlPrettyMarkup implements Printable
         return str_repeat( "\t", $indent );
     }
 
+    private function matchNamedGroups( string $pattern, ?string $subject = null, string | bool $trim = false,
+    ) : object {
+
+        $array   = [];
+        $subject ??= $this->html;
+
+        $count = preg_match_all(
+                    $pattern,
+                    $subject,
+                    $matches,
+            flags : PREG_SET_ORDER,
+        );
+
+        if ( !$count ) {
+            return arrayAsObject( $array );
+        }
+
+        foreach ( $matches as $matched ) {
+            $element = [ 'matched' => $matched[ 0 ] ];
+            $element += array_filter(
+                array    : $matched,
+                callback : static fn ( $k ) : bool => is_string( value : $k ),
+                mode     : ARRAY_FILTER_USE_KEY,
+            );
+
+            if ( $trim !== false ) {
+                $characters = ( $trim === true ) ? " \t\n\r\0\x0B" : $trim;
+                $element    = array_map(
+                    callback : static fn ( $string ) : string => trim(
+                        $string,
+                        $characters,
+                    ),
+                    array    : $element,
+                );
+            }
+
+            $array[] = (object) $element;
+        }
+
+
+        return arrayAsObject( $array );
+    }
+
     private function safelyStoreScripts() : void {
         foreach (
-            Regex::matchNamedGroups(
-                "/(?<script><script.*?>(?<js>.*?)<\/script>)/ms",
-                $this->html,
-            ) as $key => $script
+            $this->matchNamedGroups( "/(?<script><script.*?>(?<js>.*?)<\/script>)/ms" )
+            as $key => $script
         ) {
             if ( !trim( str_replace( "script>\n", 'script>', $script->js ) ) ) {
                 continue;
@@ -286,10 +327,10 @@ class HtmlPrettyMarkup implements Printable
     }
 
     private function explodeDocument() : void {
-        $this->html    = $this->squish ? Str::squish( $this->html ) : $this->html;
+        $this->html    = $this->squish ? squish( $this->html ) : $this->html;
         $this->html    = static::protectPassedVariables( $this->html );
         $fuse          = $this::FUSE;
-        $document      = Str::replaceEach(
+        $document      = replaceEach(
             [
                 '>'           => '>' . $fuse,
                 '<'           => $fuse . '<',
