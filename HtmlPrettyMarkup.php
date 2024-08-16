@@ -2,10 +2,8 @@
 
 namespace Northrook\HTML;
 
-use Northrook\Core\Interface\Printable;
-use function Northrook\arrayAsObject;
-use function Northrook\replaceEach;
-use function Northrook\squish;
+use Northrook\Interface\Printable;
+use function Northrook\{arrayAsObject, replaceEach, squish};
 
 class HtmlPrettyMarkup implements Printable
 {
@@ -71,13 +69,13 @@ class HtmlPrettyMarkup implements Printable
     }
 
     public static function restorePassedVariables( string $html ) : string {
-        return str_ireplace( static::OPERATOR, '->', $html );
+        return \str_ireplace( static::OPERATOR, '->', $html );
     }
 
     public static function protectPassedVariables( string $html ) : string {
         return preg_replace_callback(
             "/\\\$[a-zA-Z?>._':$\s\-]*/m",
-            static fn ( array $m ) => str_replace( '->', static::OPERATOR, $m[ 0 ] ),
+            static fn ( array $m ) => \str_replace( '->', static::OPERATOR, $m[ 0 ] ),
             $html,
         );
     }
@@ -91,14 +89,14 @@ class HtmlPrettyMarkup implements Printable
                 continue;
             }
 
-            $set = min( strpos( $value, ' ' ), strpos( $value, '>' ) ) ?: null;
-            $tag = trim( substr( $value, 0, $set ), '<!-/>' );
+            $set = \min( \strpos( $value, ' ' ), \strpos( $value, '>' ) ) ?: null;
+            $tag = \trim( \substr( $value, 0, $set ), '<!-/>' );
 
-            $closing = str_starts_with( $value, "</$tag" );
+            $closing = \str_starts_with( $value, "</$tag" );
 
             $type = 'line';
 
-            if ( in_array( $tag, self::$inline, true ) ) {
+            if ( \in_array( $tag, self::$inline, true ) ) {
                 $type = 'inline';
             }
 
@@ -109,7 +107,7 @@ class HtmlPrettyMarkup implements Printable
                 $this->isClosing( $this->element[ $key + 1 ] ?? null, $tag )
             ) {
                 $value .= $this->element[ $key + 1 ];
-                $value = str_replace( '> <', '><', $value );
+                $value = \str_replace( '> <', '><', $value );
                 // var_dump( $value );
                 // $inline   = true;
                 $type     = 'inline';
@@ -128,7 +126,7 @@ class HtmlPrettyMarkup implements Printable
                             $type = 'comment';
                         }
                         else {
-                            if ( str_starts_with( $tag, 'script:' ) ) {
+                            if ( \str_starts_with( $tag, 'script:' ) ) {
                                 $type = 'script';
                             }
                         }
@@ -150,11 +148,11 @@ class HtmlPrettyMarkup implements Printable
     }
 
     private function isClosing( ?string $match, ?string $current = null ) : bool {
-        return str_starts_with( $match, "</$current" );
+        return \str_starts_with( $match, "</$current" );
     }
 
     private function isText( ?string $match ) : bool {
-        return !str_contains( $match, '<' );
+        return !\str_contains( $match, '<' );
     }
 
     private function constructDocument() : void {
@@ -181,14 +179,14 @@ class HtmlPrettyMarkup implements Printable
             }
             else {
                 if ( $node->type === 'script' ) {
-                    $key    = (int) filter_var( $node->element, FILTER_SANITIZE_NUMBER_INT );
+                    $key    = (int) \filter_var( $node->element, FILTER_SANITIZE_NUMBER_INT );
                     $script = $this->scripts[ $key ] ?? null;
                     $out[]  = $this->indent( $level ) . $script;
                 }
                 else {
                     if ( $node->type === 'script' ) {
                         // $fuse	= $this::FUSE;
-                        $key    = (int) filter_var( $node->element, FILTER_SANITIZE_NUMBER_INT );
+                        $key    = (int) \filter_var( $node->element, FILTER_SANITIZE_NUMBER_INT );
                         $script = $this->scripts[ $key ] ?? null;
                         // if ( ) {
                         // 	$script = $this::replaceEach(

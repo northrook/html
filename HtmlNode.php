@@ -4,7 +4,7 @@ declare( strict_types = 1 );
 
 namespace Northrook\HTML;
 
-use Northrook\Core\Trait\PropertyAccessor;
+use Northrook\Trait\PropertyAccessor;
 use Northrook\Minify;
 
 /**
@@ -56,7 +56,7 @@ readonly class HtmlNode
      * @return \DOMElement[]
      */
     public function getChildNodes() : array {
-        return iterator_to_array( $this->dom->firstElementChild->childNodes );
+        return \iterator_to_array( $this->dom->firstElementChild->childNodes );
     }
 
     protected function getAttributes() : array {
@@ -80,12 +80,14 @@ readonly class HtmlNode
 
         $html = Minify::HTML( $html, false )->toString();
 
-        if ( false === str_starts_with( $html, '<' ) && false === str_starts_with( $html, '>' ) ) {
+        if ( false === \str_starts_with( $html, '<' )
+             &&
+             false === \str_starts_with( $html, '>' ) ) {
             $html = "<div $html>";
         }
         else {
-            $html = strstr( $html, '>', true ) . '>';
-            $html = preg_replace(
+            $html = \strstr( $html, '>', true ) . '>';
+            $html = \preg_replace(
                 pattern     : '/^<(\w.+):\w+? /',
                 replacement : '<$1 ',
                 subject     : $html,
