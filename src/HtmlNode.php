@@ -147,6 +147,16 @@ readonly class HtmlNode
 
     public static function unwrap( string $html, string ...$tags ) : string
     {
+        $proceed = false;
+        foreach ( $tags as $tag ) {
+            if ( \str_starts_with( $html, "<$tag" ) ) {
+                $proceed = true;
+            }
+        }
+        if ( !$proceed ) {
+            return $html;
+        }
+
         $element = new static( $html );
 
         foreach ( $element->iterateChildNodes() as $childNode ) {
