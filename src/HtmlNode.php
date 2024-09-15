@@ -8,10 +8,14 @@ use JetBrains\PhpStorm\Language;
 use Northrook\Logger\Log;
 use Northrook\Trait\PropertyAccessor;
 use Northrook\Minify;
+use function Northrook\squish;
 use const Northrook\EMPTY_STRING;
 
 
 /**
+ * @template AttributeName of non-empty-string
+ * @template AttributeValue of string
+ *
  * @property-read string html
  * @property-read string innerHtml
  * @property-read array  attributes
@@ -24,7 +28,8 @@ readonly class HtmlNode
     public \DOMDocument $dom;
 
     public function __construct(
-        ?string $html = null,
+        ?string      $html = null,
+        private bool $validate = false,
     )
     {
         $this->dom = new \DOMDocument();
@@ -124,9 +129,16 @@ readonly class HtmlNode
         return $attributes;
     }
 
+    /**
+     * @param string  $html
+     *
+     * @return array<AttributeName, AttributeValue>
+     */
     public static function extractAttributes( string $html ) : array
     {
-        $html = Minify::HTML( $html, false )->toString();
+        if ( !$html = squish( $html, false ) ) {
+            return [];
+        }
 
         if ( false === \str_starts_with( $html, '<' )
              &&
@@ -189,7 +201,11 @@ readonly class HtmlNode
             // }
         }
 
-        dump( $exception );
         Log::exception( $exception );
+
+        if ( $this->validate ) {
+            dump( $exception );
+            return;
+        }
     }
 }
