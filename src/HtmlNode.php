@@ -9,8 +9,8 @@ use Northrook\Logger\Log;
 use Northrook\Trait\PropertyAccessor;
 use Northrook\Minify;
 use function Northrook\squish;
+use function Northrook\stringEncode;
 use const Northrook\EMPTY_STRING;
-
 
 /**
  * @template AttributeName of non-empty-string
@@ -24,15 +24,14 @@ readonly class HtmlNode
 {
     use PropertyAccessor;
 
-
     public \DOMDocument $dom;
 
     public function __construct(
-        ?string      $html = null,
-        private bool $validate = false,
+            ?string      $html = null,
+            private bool $validate = false,
     )
     {
-        $this->dom = new \DOMDocument();
+        $this->dom = new \DOMDocument( "1.0", "UTF-8" );
         if ( $html ) {
             $this->load( $html );
         }
@@ -48,14 +47,15 @@ readonly class HtmlNode
     }
 
     final public function load(
-        #[Language( 'HTML' )]
-        string $html,
+            #[Language( 'HTML' )]
+            string $string,
     ) : self
     {
         try {
+            $html = stringEncode( $string );
             $this->dom->loadHTML(
-                source  : '<div>' . \str_replace( "\r\n", "\n", $html ) . '</div>',
-                options : LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
+                    source  : '<div>' . \str_replace( "\r\n", "\n", $html ) . '</div>',
+                    options : LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
             );
             $this->dom->encoding = 'UTF-8';
         }
@@ -148,9 +148,9 @@ readonly class HtmlNode
         else {
             $html = \strstr( $html, '>', true ) . '>';
             $html = \preg_replace(
-                pattern     : '/^<(\w.+):\w+? /',
-                replacement : '<$1 ',
-                subject     : $html,
+                    pattern     : '/^<(\w.+):\w+? /',
+                    replacement : '<$1 ',
+                    subject     : $html,
             );
         }
 
