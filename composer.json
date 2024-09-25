@@ -14,6 +14,9 @@
       "Northrook\\HTML\\": "src"
     }
   },
+  "scripts": {
+    "phpstan": "vendor/bin/phpstan analyse"
+  },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
@@ -22,12 +25,12 @@
     "ext-libxml": "*",
     "northrook/core": "dev-main",
     "northrook/html-element": "dev-main",
-    "northrook/html-formatter": "dev-main",
     "northrook/minify": "dev-main",
     "northrook/filesystem": "dev-main",
     "northrook/array-access": "dev-main"
   },
   "require-dev": {
+    "phpstan/phpstan": "@stable",
     "northrook/dev-env": "dev-main"
   }
 }
