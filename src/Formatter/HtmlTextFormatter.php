@@ -13,9 +13,8 @@ use Northrook\HTML\HtmlFormat;
 use Northrook\Interface\Printable;
 use Northrook\Logger\Log;
 use Northrook\Trait\PrintableClass;
-use function Northrook\replaceEach;
-use function Northrook\stringEncode;
-use const Northrook\EMPTY_STRING;
+use function String\{replaceEach, encode};
+use const String\EMPTY_STRING;
 
 class HtmlTextFormatter implements Printable
 {
@@ -129,7 +128,7 @@ class HtmlTextFormatter implements Printable
     ) : self
     {
         try {
-            $html = stringEncode( $string );
+            $html = encode( $string );
             ( $this->dom ??= new DOMDocument() )->loadHTML(
                     source  : '<div>' . \str_replace( "\r\n", "\n", $html ) . '</div>',
                     options : LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,

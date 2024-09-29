@@ -2,7 +2,7 @@
 
 namespace Northrook\HTML;
 
-use function Northrook\escapeHtmlText;
+use function String\escapeHtml;
 
 final class HtmlFormat
 {
@@ -20,7 +20,7 @@ final class HtmlFormat
             null | string | \Stringable $string,
     ) : ?string
     {
-        return $string ? \ucfirst( escapeHtmlText( $string ) ) : null;
+        return $string ? \ucfirst( escapeHtml( $string ) ) : null;
     }
 
     /**
@@ -34,7 +34,7 @@ final class HtmlFormat
             null | string | \Stringable $string,
     ) : ?string
     {
-        return $string ? \ucfirst( escapeHtmlText( $string ) ) : null;
+        return $string ? \ucfirst( escapeHtml( $string ) ) : null;
     }
 
     /**
@@ -48,6 +48,6 @@ final class HtmlFormat
             null | string | \Stringable $string,
     ) : ?string
     {
-        return $string ? \ucfirst( escapeHtmlText( $string ) ) : null;
+        return $string ? \ucfirst( escapeHtml( $string ) ) : null;
     }
 }

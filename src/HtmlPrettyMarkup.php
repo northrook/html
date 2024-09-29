@@ -3,30 +3,33 @@
 namespace Northrook\HTML;
 
 use Northrook\Interface\Printable;
-use function Northrook\{arrayAsObject, replaceEach, squish};
+use function Array\asObject;
+use function String\replaceEach;
+use function String\squish;
 
 class HtmlPrettyMarkup implements Printable
 {
-    private const OPERATOR = '[%OPERATOR%]';
-    private const FUSE     = '[%FUSE%]';
+    private const string OPERATOR = '[%OPERATOR%]';
+    private const string FUSE     = '[%FUSE%]';
 
+    /** @var string[]   */
     private static array $inline = [
-        'br',
-        'hr',
-        'img',
-        'input',
-        'link',
-        'meta',
-        'param',
-        'source',
-        'track',
-        'wbr',
-        'circle',
-        'path',
-        'rect',
-        'line',
-        'polyline',
-        // 'span',
+            'br',
+            'hr',
+            'img',
+            'input',
+            'link',
+            'meta',
+            'param',
+            'source',
+            'track',
+            'wbr',
+            'circle',
+            'path',
+            'rect',
+            'line',
+            'polyline',
+            // 'span',
     ];
 
     private array $element  = [];
@@ -36,22 +39,24 @@ class HtmlPrettyMarkup implements Printable
     private array $nodes;
 
     private array $captureAllEnclosed = [
-        'script',
+            'script',
     ];
 
-    public function __construct( private string $html, public bool $squish = true ) {
+    public function __construct( private string $html, public bool $squish = true )
+    {
         $this->safelyStoreScripts();
         $this->explodeDocument();
         $this->parseDocumentElements();
         $this->constructDocument();
     }
 
-
-    public function toString() : ?string {
+    public function toString() : ?string
+    {
         return $this->html;
     }
 
-    final public function print() : void {
+    final public function print() : void
+    {
         echo $this->html;
     }
 
@@ -60,27 +65,32 @@ class HtmlPrettyMarkup implements Printable
      *
      * @return string
      */
-    public function __toString() : string {
+    public function __toString() : string
+    {
         return $this->html;
     }
 
-    public static function pretty( string $html ) : string {
+    public static function pretty( string $html ) : string
+    {
         return ( new self( $html ) )->html;
     }
 
-    public static function restorePassedVariables( string $html ) : string {
+    public static function restorePassedVariables( string $html ) : string
+    {
         return \str_ireplace( static::OPERATOR, '->', $html );
     }
 
-    public static function protectPassedVariables( string $html ) : string {
-        return preg_replace_callback(
-            "/\\\$[a-zA-Z?>._':$\s\-]*/m",
-            static fn ( array $m ) => \str_replace( '->', static::OPERATOR, $m[ 0 ] ),
-            $html,
+    public static function protectPassedVariables( string $html ) : string
+    {
+        return \preg_replace_callback(
+                "/\\\$[a-zA-Z?>._':$\s\-]*/m",
+                static fn( array $m ) => \str_replace( '->', static::OPERATOR, $m[ 0 ] ),
+                $html,
         );
     }
 
-    private function parseDocumentElements() : void {
+    private function parseDocumentElements() : void
+    {
         $skipNext = false;
         foreach ( $this->element as $key => $value ) {
             // var_dump( $value );
@@ -102,9 +112,9 @@ class HtmlPrettyMarkup implements Printable
 
             // > If the tag is effectively empty
             if (
-                !$this->isClosing( $value, $tag )
-                &&
-                $this->isClosing( $this->element[ $key + 1 ] ?? null, $tag )
+                    !$this->isClosing( $value, $tag )
+                    &&
+                    $this->isClosing( $this->element[ $key + 1 ] ?? null, $tag )
             ) {
                 $value .= $this->element[ $key + 1 ];
                 $value = \str_replace( '> <', '><', $value );
@@ -135,11 +145,10 @@ class HtmlPrettyMarkup implements Printable
             }
 
             $this->elements[ $key ] = (object) [
-                'tag'     => $tag,
-                'type'    => $type,
-                'element' => $value,
+                    'tag'     => $tag,
+                    'type'    => $type,
+                    'element' => $value,
             ];
-
         }
 
         // print_r( $this->element );
@@ -147,35 +156,37 @@ class HtmlPrettyMarkup implements Printable
         // Debug::print( $this->elements );
     }
 
-    private function isClosing( ?string $match, ?string $current = null ) : bool {
+    private function isClosing( ?string $match, ?string $current = null ) : bool
+    {
         return \str_starts_with( $match, "</$current" );
     }
 
-    private function isText( ?string $match ) : bool {
+    private function isText( ?string $match ) : bool
+    {
         return !\str_contains( $match, '<' );
     }
 
-    private function constructDocument() : void {
+    private function constructDocument() : void
+    {
         $skip  = [
-            'DOCTYPE',
-            'html',
-            'head',
-            'body',
+                'DOCTYPE',
+                'html',
+                'head',
+                'body',
         ];
         $out   = [];
         $level = 0;
 
         foreach ( $this->elements as $node ) {
-
             if ( $node->tag === 'head' ) {
                 $level = ( $node->type !== 'closing' ) ? +1 : -1;
             }
 
             if ( in_array( $node->tag, $skip, true ) ) {
                 $bump  =
-                    ( $node->tag === 'body' || ( $node->type !== 'closing' && $node->tag === 'head' ) ) ? PHP_EOL : '';
+                        ( $node->tag === 'body' || ( $node->type !== 'closing' && $node->tag === 'head' ) ) ? PHP_EOL
+                                : '';
                 $out[] = $bump . $node->element;
-
             }
             else {
                 if ( $node->type === 'script' ) {
@@ -211,24 +222,20 @@ class HtmlPrettyMarkup implements Printable
                             if ( str_ends_with( $line, '{' ) || str_ends_with( $line, '(' ) ) {
                                 $indent++;
                             }
-
                         }
                     }
                     else {
                         if ( $node->type === 'inline' ) {
                             $out[] = $this->indent( $level ) . trim( $node->element );
-
                         }
                         else {
                             if ( $node->type === 'comment' ) {
                                 $out[] = PHP_EOL . $this->indent( $level ) . trim( $node->element );
-
                             }
                             else {
                                 if ( $node->type === 'line' ) {
                                     $out[] = $this->indent( $level ) . trim( $node->element );
                                     $level++;
-
                                 }
                                 else {
                                     if ( $node->type === 'closing' ) {
@@ -237,7 +244,6 @@ class HtmlPrettyMarkup implements Printable
                                         }
 
                                         $out[] = $this->indent( $level ) . trim( $node->element );
-
                                     }
                                     else {
                                         $out[] = $this->indent( $level ) . trim( $node->element );
@@ -250,66 +256,65 @@ class HtmlPrettyMarkup implements Printable
             }
         }
 
-
         $this->html = implode( PHP_EOL, $out );
 
         $this->html = static::restorePassedVariables( $this->html );
-
     }
 
-    private function indent( int $element ) : string {
+    private function indent( int $element ) : string
+    {
         $indent = ( $element <= 0 ) ? 0 : $element;
 
         return str_repeat( "\t", $indent );
     }
 
     private function matchNamedGroups( string $pattern, ?string $subject = null, string | bool $trim = false,
-    ) : object {
-
+    ) : object
+    {
         $array   = [];
         $subject ??= $this->html;
 
         $count = preg_match_all(
-                    $pattern,
-                    $subject,
-                    $matches,
-            flags : PREG_SET_ORDER,
+                        $pattern,
+                        $subject,
+                        $matches,
+                flags : PREG_SET_ORDER,
         );
 
         if ( !$count ) {
-            return arrayAsObject( $array );
+            return asObject( $array );
         }
 
         foreach ( $matches as $matched ) {
             $element = [ 'matched' => $matched[ 0 ] ];
             $element += array_filter(
-                array    : $matched,
-                callback : static fn ( $k ) : bool => is_string( value : $k ),
-                mode     : ARRAY_FILTER_USE_KEY,
+                    array    : $matched,
+                    callback : static fn( $k ) : bool => is_string( value : $k ),
+                    mode     : ARRAY_FILTER_USE_KEY,
             );
 
             if ( $trim !== false ) {
                 $characters = ( $trim === true ) ? " \t\n\r\0\x0B" : $trim;
                 $element    = array_map(
-                    callback : static fn ( $string ) : string => trim(
-                        $string,
-                        $characters,
-                    ),
-                    array    : $element,
+                        callback : static fn( $string ) : string => trim(
+                                $string,
+                                $characters,
+                        ),
+                        array    : $element,
                 );
             }
 
             $array[] = (object) $element;
         }
 
-
-        return arrayAsObject( $array );
+        return asObject( $array );
     }
 
-    private function safelyStoreScripts() : void {
+    private function safelyStoreScripts() : void
+    {
         foreach (
-            $this->matchNamedGroups( "/(?<script><script.*?>(?<js>.*?)<\/script>)/ms" )
-            as $key => $script
+                $this->matchNamedGroups( "/(?<script><script.*?>(?<js>.*?)<\/script>)/ms" )
+                as $key => $script
         ) {
             if ( !trim( str_replace( "script>\n", 'script>', $script->js ) ) ) {
                 continue;
@@ -317,26 +322,27 @@ class HtmlPrettyMarkup implements Printable
 
             $this->scripts[ $key ] = $script->matched;
             $this->html            = str_replace(
-                $script->matched,
-                "<script:[$key]>",
-                $this->html,
+                    $script->matched,
+                    "<script:[$key]>",
+                    $this->html,
             );
         }
     }
 
-    private function explodeDocument() : void {
+    private function explodeDocument() : void
+    {
         $this->html    = $this->squish ? squish( $this->html ) : $this->html;
         $this->html    = static::protectPassedVariables( $this->html );
         $fuse          = $this::FUSE;
         $document      = replaceEach(
-            [
-                '>'           => '>' . $fuse,
-                '<'           => $fuse . '<',
-                "$fuse $fuse" => $fuse,
-                "$fuse$fuse"  => $fuse,
-                ' />'         => '/>',
-            ],
-            $this->html,
+                [
+                        '>'           => '>' . $fuse,
+                        '<'           => $fuse . '<',
+                        "$fuse $fuse" => $fuse,
+                        "$fuse$fuse"  => $fuse,
+                        ' />'         => '/>',
+                ],
+                $this->html,
         );
         $explode       = explode( $fuse, $document );
         $this->element = array_filter( $explode, 'trim' );

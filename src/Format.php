@@ -8,10 +8,8 @@ use Northrook\HTML\Formatter\Newline;
 use Northrook\HTML\Formatter\Purpose;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Minify;
-use function Northrook\escapeHtmlText;
-use function Northrook\stringEncode;
-use function Northrook\stringStripTags;
-use const Northrook\EMPTY_STRING;
+use function String\escapeHtml;
+use const String\EMPTY_STRING;
 
 /**
  * All static functions _must_ return string.
@@ -35,7 +33,7 @@ class Format
             default            => $string
         };
 
-        return escapeHtmlText( $string );
+        return escapeHtml( $string );
     }
 
     public static function nl2p( string $string ) : string
@@ -102,7 +100,7 @@ class Format
         // TODO: Code highlighter | Use tempest/highlight
         return \preg_replace_callback(
                 '/`(\S.*?)`/m',
-                static fn( $matches ) => new Element( 'code', $attributes, escapeHtmlText( $matches[ 1 ] ) ),
+                static fn( $matches ) => new Element( 'code', $attributes, escapeHtml( $matches[ 1 ] ) ),
                 $string,
         );
     }
