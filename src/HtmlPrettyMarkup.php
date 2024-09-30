@@ -3,16 +3,15 @@
 namespace Northrook\HTML;
 
 use Northrook\Interface\Printable;
-use function Array\asObject;
-use function String\replaceEach;
-use function String\squish;
+use Support\Arr;
+use Support\Str;
 
 class HtmlPrettyMarkup implements Printable
 {
     private const string OPERATOR = '[%OPERATOR%]';
     private const string FUSE     = '[%FUSE%]';
 
-    /** @var string[]   */
+    /** @var string[] */
     private static array $inline = [
             'br',
             'hr',
@@ -282,7 +281,7 @@ class HtmlPrettyMarkup implements Printable
         );
 
         if ( !$count ) {
-            return asObject( $array );
+            return Arr::asObject( $array );
         }
 
         foreach ( $matches as $matched ) {
@@ -307,7 +306,7 @@ class HtmlPrettyMarkup implements Printable
             $array[] = (object) $element;
         }
 
-        return asObject( $array );
+        return Arr::asObject( $array );
     }
 
     private function safelyStoreScripts() : void
@@ -331,10 +330,10 @@ class HtmlPrettyMarkup implements Printable
 
     private function explodeDocument() : void
     {
-        $this->html    = $this->squish ? squish( $this->html ) : $this->html;
+        $this->html    = $this->squish ? Str::squish( $this->html ) : $this->html;
         $this->html    = static::protectPassedVariables( $this->html );
         $fuse          = $this::FUSE;
-        $document      = replaceEach(
+        $document      = Str::replaceEach(
                 [
                         '>'           => '>' . $fuse,
                         '<'           => $fuse . '<',
@@ -344,7 +343,7 @@ class HtmlPrettyMarkup implements Printable
                 ],
                 $this->html,
         );
-        $explode       = explode( $fuse, $document );
-        $this->element = array_filter( $explode, 'trim' );
+        $explode       = \explode( $fuse, $document );
+        $this->element = \array_filter( $explode, 'trim' );
     }
 }

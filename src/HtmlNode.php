@@ -8,8 +8,8 @@ use JetBrains\PhpStorm\Language;
 use Northrook\Logger\Log;
 use Northrook\Trait\PropertyAccessor;
 use Northrook\Minify;
-use function String\{encode, squish};
-use const String\EMPTY_STRING;
+use Support\Str;
+use const Support\EMPTY_STRING;
 
 /**
  * @template AttributeName of non-empty-string
@@ -51,7 +51,7 @@ readonly class HtmlNode
     ) : self
     {
         try {
-            $html = encode( $string );
+            $html = Str::encode( $string );
             $this->dom->loadHTML(
                     source  : '<div>' . \str_replace( "\r\n", "\n", $html ) . '</div>',
                     options : LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
@@ -135,7 +135,7 @@ readonly class HtmlNode
      */
     public static function extractAttributes( string $html ) : array
     {
-        if ( !$html = squish( $html, false ) ) {
+        if ( !$html = Str::squish( $html, false ) ) {
             return [];
         }
 

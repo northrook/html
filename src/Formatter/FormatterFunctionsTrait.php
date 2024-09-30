@@ -5,7 +5,7 @@ declare( strict_types = 1 );
 namespace Northrook\HTML\Formatter;
 
 use Northrook\HTML\Element\Attributes;
-use const String\EMPTY_STRING;
+use const Support\EMPTY_STRING;
 
 trait FormatterFunctionsTrait
 {

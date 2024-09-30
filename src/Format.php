@@ -9,7 +9,7 @@ use Northrook\HTML\Formatter\Purpose;
 use Northrook\HTML\Element\Attributes;
 use Northrook\Minify;
 use function String\escapeHtml;
-use const String\EMPTY_STRING;
+use const Support\EMPTY_STRING;
 
 /**
  * All static functions _must_ return string.
@@ -51,7 +51,6 @@ class Format
         if ( !$string ) {
             return EMPTY_STRING;
         }
-
 
         $html = Minify::HTML( $string );
 
