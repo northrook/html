@@ -1,13 +1,13 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types = 1);
 
 namespace Northrook\HTML;
 
 use JetBrains\PhpStorm\Language;
 use Northrook\Logger\Log;
-use Northrook\Trait\PropertyAccessor;
 use Northrook\Minify;
+use Support\PropertyAccessor;
 use Support\Str;
 use const Support\EMPTY_STRING;
 
@@ -15,9 +15,9 @@ use const Support\EMPTY_STRING;
  * @template AttributeName of non-empty-string
  * @template AttributeValue of string
  *
- * @property-read string html
- * @property-read string innerHtml
- * @property-read array  attributes
+ * @property-read string $html
+ * @property-read string $innerHtml
+ * @property-read array  $attributes
  */
 readonly class HtmlNode
 {
@@ -26,40 +26,38 @@ readonly class HtmlNode
     public \DOMDocument $dom;
 
     public function __construct(
-            ?string      $html = null,
-            private bool $validate = false,
-    )
-    {
-        $this->dom = new \DOMDocument( "1.0", "UTF-8" );
-        if ( $html ) {
-            $this->load( $html );
+        ?string      $html = null,
+        private bool $validate = false,
+    ) {
+        $this->dom = new \DOMDocument("1.0", "UTF-8");
+        if ($html) {
+            $this->load($html);
         }
     }
 
-    public function __get( string $property )
+    public function __get(string $property) : string|array|null
     {
-        return match ( $property ) {
+        return match ($property) {
             'html'       => $this->getHtml(),
             'innerHtml'  => $this->getInnerHtml(),
             'attributes' => $this->getAttributes(),
+            default => throw new \RuntimeException("Undefined property: $property"),
         };
     }
 
     final public function load(
-            #[Language( 'HTML' )]
-            string $string,
-    ) : self
-    {
+        #[Language('HTML')]
+        string $string,
+    ) : self {
         try {
-            $html = Str::encode( $string );
+            $html = Str::encode($string);
             $this->dom->loadHTML(
-                    source  : '<div>' . \str_replace( "\r\n", "\n", $html ) . '</div>',
-                    options : LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
+                source  : '<div>' . \str_replace("\r\n", "\n", $html) . '</div>',
+                options : LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
             );
             $this->dom->encoding = 'UTF-8';
-        }
-        catch ( \Exception $exception ) {
-            $this->errorHandler( $exception );
+        } catch (\Exception $exception) {
+            $this->errorHandler($exception);
         }
 
         return $this;
@@ -71,26 +69,29 @@ readonly class HtmlNode
     //     $this->dom->loadHTML( $html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR );
     // }
 
-    protected function getHtml() : string
+    /**
+     * @param string  $appendTo
+     *
+     * @return string
+     */
+    public function getHtml(string $appendTo = EMPTY_STRING) : string
     {
-        $content = EMPTY_STRING;
-
-        foreach ( $this->getChildNodes() as $node ) {
-            $content .= $this->dom->saveXML( $node, options : LIBXML_NOXMLDECL );
+        foreach ($this->getChildNodes() as $node) {
+            $appendTo .= $this->dom->saveXML($node, options : LIBXML_NOXMLDECL);
         }
 
         // foreach ( Tag::SELF_CLOSING as $tag ) {
         //     $content = \str_replace( "<$tag></$tag>", "<$tag/>", $content );
         // }
-        return $content;
+        return $appendTo;
     }
 
     protected function getInnerHtml() : string
     {
-        trigger_error( 'Deprecated', E_USER_DEPRECATED );
+        trigger_error('Deprecated', E_USER_DEPRECATED);
         $html = '';
-        foreach ( $this->getChildNodes() as $childNode ) {
-            $html .= $childNode->ownerDocument->saveHTML( $childNode );
+        foreach ($this->getChildNodes() as $childNode) {
+            $html .= $childNode->ownerDocument->saveHTML($childNode);
         }
         return $html;
     }
@@ -100,7 +101,7 @@ readonly class HtmlNode
      */
     public function getChildNodes() : array
     {
-        return \iterator_to_array( $this->dom->documentElement?->childNodes ?? [] );
+        return \iterator_to_array($this->dom->documentElement?->childNodes ?? []);
     }
 
     /**
@@ -117,11 +118,11 @@ readonly class HtmlNode
 
         $node = $this->dom->firstElementChild;
 
-        if ( !$node ) {
+        if (!$node) {
             return $attributes;
         }
 
-        foreach ( $node->attributes as $attribute ) {
+        foreach ($node->attributes as $attribute) {
             $attributes[ $attribute->nodeName ] = $attribute->nodeValue;
         }
 
@@ -133,64 +134,63 @@ readonly class HtmlNode
      *
      * @return array<AttributeName, AttributeValue>
      */
-    public static function extractAttributes( string $html ) : array
+    public static function extractAttributes(string $html) : array
     {
-        if ( !$html = Str::squish( $html, false ) ) {
+        if (!$html = Str::squish($html, false)) {
             return [];
         }
 
-        if ( false === \str_starts_with( $html, '<' )
+        if (false === \str_starts_with($html, '<')
              &&
-             false === \str_starts_with( $html, '>' ) ) {
+             false === \str_starts_with($html, '>')) {
             $html = "<div $html>";
-        }
-        else {
-            $html = \strstr( $html, '>', true ) . '>';
+        } else {
+            $html = \strstr($html, '>', true) . '>';
             $html = \preg_replace(
-                    pattern     : '/^<(\w.+):\w+? /',
-                    replacement : '<$1 ',
-                    subject     : $html,
+                pattern     : '/^<(\w.+):\w+? /',
+                replacement : '<$1 ',
+                subject     : $html,
             );
         }
 
-        return ( new HtmlNode( $html ) )->getAttributes();
+        return (new HtmlNode($html))->getAttributes();
     }
 
-    public static function unwrap( string $html, string ...$tags ) : string
+    public static function unwrap(string $html, string ...$tags) : string
     {
         $proceed = false;
-        foreach ( $tags as $tag ) {
-            if ( \str_starts_with( $html, "<$tag" ) ) {
+        foreach ($tags as $tag) {
+            if (\str_starts_with($html, "<$tag")) {
                 $proceed = true;
             }
         }
-        if ( !$proceed ) {
+        if (!$proceed) {
             return $html;
         }
 
-        $element = new static( $html );
+        $element = new static($html);
 
-        foreach ( $element->iterateChildNodes() as $childNode ) {
-            if ( !\in_array( $childNode->nodeName, $tags ) ) {
+        foreach ($element->iterateChildNodes() as $childNode) {
+            if (!\in_array($childNode->nodeName, $tags)) {
                 continue;
             };
 
-            foreach ( $childNode->childNodes as $nestedChild ) {
-                $childNode->parentNode->insertBefore( $nestedChild->cloneNode( true ), $childNode );
+            foreach ($childNode->childNodes as $nestedChild) {
+                $childNode->parentNode->insertBefore($nestedChild->cloneNode(true), $childNode);
             }
-            $childNode->parentNode->removeChild( $childNode );
+            $childNode->parentNode->removeChild($childNode);
         }
 
         return $element->getHtml();
     }
 
-    private function errorHandler( \Exception $exception ) : void
+    private function errorHandler(\Exception $exception) : void
     {
-        if ( $exception instanceof \ErrorException ) {
+        if ($exception instanceof \ErrorException) {
             $severity = $exception->getSeverity();
             $message  = $exception->getMessage();
 
-            if ( \str_contains( $message, ' invalid in Entity, ' ) ) {
+            if (\str_contains($message, ' invalid in Entity, ')) {
                 return;
             }
 
@@ -200,10 +200,10 @@ readonly class HtmlNode
             // }
         }
 
-        Log::exception( $exception );
+        Log::exception($exception);
 
-        if ( $this->validate ) {
-            dump( $exception );
+        if ($this->validate) {
+            dump($exception);
             return;
         }
     }

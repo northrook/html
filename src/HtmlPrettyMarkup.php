@@ -2,7 +2,7 @@
 
 namespace Northrook\HTML;
 
-use Northrook\Interface\Printable;
+use Interface\Printable;
 use Support\Arr;
 use Support\Str;
 

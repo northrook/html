@@ -1,13 +1,15 @@
 <?php
 
-namespace Northrook\HTML\Formatter;
+declare(strict_types = 1);
 
-use Northrook\Trait\StaticClass;
+namespace Northrook\HTML\Formatter;
 
 final class Stopwords
 {
-    use StaticClass;
-
+    // @formatter:off
+    /**
+     * @var array<string, string[]>
+     */
     private static array $list = [
         'en' => [
             "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
@@ -25,22 +27,33 @@ final class Stopwords
 
         ],
     ];
+    // @formatter:on
 
-    public static function add( string $word, string $group = 'en' ) : void {
+    public static function add(string $word, string $group = 'en') : void
+    {
         Stopwords::$list[ $group ][] = $word;
     }
 
     // TODO Add Debug::log() with a group is empty or missing
-    public static function get( string $group = 'en' ) : array {
+
+    /**
+     * @param string  $group
+     *
+     * @return string[]
+     */
+    public static function get(string $group = 'en') : array
+    {
         return Stopwords::$list[ $group ] ?? [];
     }
 
-    public static function remove( string $word, string $group = 'en' ) : void {
-        unset( Stopwords::$list[ $group ][ $word ] );
+    public static function remove(string $word, string $group = 'en') : void
+    {
+        unset(Stopwords::$list[ $group ][ $word ]);
     }
 
-    public static function has( string $word, string $group = 'en' ) : bool {
-        return isset( Stopwords::$list[ $group ][ $word ] );
+    public static function has(string $word, string $group = 'en') : bool
+    {
+        return isset(Stopwords::$list[ $group ][ $word ]);
     }
 
 }

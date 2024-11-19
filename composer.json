@@ -23,7 +23,6 @@
     "php": ">=8.3",
     "ext-dom": "*",
     "ext-libxml": "*",
-    "northrook/core": "dev-main",
     "northrook/html-element": "dev-main",
     "northrook/minify": "dev-main",
     "northrook/filesystem": "dev-main",
