@@ -58,5 +58,4 @@ final class Stopwords
     {
         return isset(Stopwords::$list[ $group ][ $word ]);
     }
-
 }
