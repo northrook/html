@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace Northrook\HTML\Formatter;
 
+trigger_deprecation(Stopwords::class, 'html', 'Deprected.');
+
+
 final class Stopwords
 {
     // @formatter:off

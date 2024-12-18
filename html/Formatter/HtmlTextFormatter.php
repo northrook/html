@@ -25,11 +25,13 @@ class HtmlTextFormatter implements Printable
 
     public function __construct(string $source)
     {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         $this->load($source);
     }
 
     public function insertWbr(string | array $at = '-') : self
     {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         foreach ((array) $at as $opportunity) {
             foreach ($this->query('//text()') as $textNode) {
                 if (!\str_contains($textNode->nodeValue, $opportunity)) {
@@ -58,11 +60,13 @@ class HtmlTextFormatter implements Printable
 
     protected function createTextNode(string $tag) : \DOMText
     {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         return $this->dom->createTextNode($tag);
     }
 
     protected function createElement(string $tag, string $content = EMPTY_STRING) : \DOMNode
     {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         try {
             $element = $this->dom->createElement($tag, $content);
         } catch (\Exception $exception) {
@@ -75,6 +79,7 @@ class HtmlTextFormatter implements Printable
         string | array $tag = [ 'p', 'span' ],
         int            $characterTrigger = 12,
     ) : self {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         // Bail early if the textContent is too short
         if (\strlen($this->dom->textContent) <= ($characterTrigger * 2.75)) {
             return $this;
@@ -116,6 +121,7 @@ class HtmlTextFormatter implements Printable
         string    $expression,
         ?\DOMNode $context = null,
     ) : DOMNodeList | false {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         return ($this->xPath ??= new \DOMXPath($this->dom))->query($expression);
     }
 
@@ -123,6 +129,7 @@ class HtmlTextFormatter implements Printable
         #[Language('HTML')]
         string $string,
     ) : self {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         try {
             $html = Str::encode($string);
             ($this->dom ??= new DOMDocument())->loadHTML(
@@ -139,6 +146,7 @@ class HtmlTextFormatter implements Printable
 
     final public function __toString() : string
     {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         $content = EMPTY_STRING;
 
         foreach ($this->dom->documentElement->childNodes as $node) {
@@ -153,6 +161,7 @@ class HtmlTextFormatter implements Printable
 
     private function errorHandler(\Exception $exception) : void
     {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         if ($exception instanceof \ErrorException) {
             $severity = $exception->getSeverity();
             $message  = $exception->getMessage();

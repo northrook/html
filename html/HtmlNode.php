@@ -29,19 +29,20 @@ readonly class HtmlNode
         ?string      $html = null,
         private bool $validate = false,
     ) {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         $this->dom = new \DOMDocument("1.0", "UTF-8");
         if ($html) {
             $this->load($html);
         }
     }
 
-    public function __get(string $property) : string|array|null
+    public function __get(string $property) : string | array | null
     {
         return match ($property) {
             'html'       => $this->getHtml(),
             'innerHtml'  => $this->getInnerHtml(),
             'attributes' => $this->getAttributes(),
-            default => throw new \RuntimeException("Undefined property: $property"),
+            default      => throw new \RuntimeException("Undefined property: $property"),
         };
     }
 
@@ -158,6 +159,7 @@ readonly class HtmlNode
 
     public static function unwrap(string $html, string ...$tags) : string
     {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         $proceed = false;
         foreach ($tags as $tag) {
             if (\str_starts_with($html, "<$tag")) {

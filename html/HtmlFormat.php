@@ -17,10 +17,10 @@ final class HtmlFormat
      * @return null|string
      */
     public static function title(
-            null | string | \Stringable $string,
-    ) : ?string
-    {
-        return $string ? \ucfirst( escapeHtml( $string ) ) : null;
+        null | string | \Stringable $string,
+    ) : ?string {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
+        return $string ? \ucfirst(escapeHtml($string)) : null;
     }
 
     /**
@@ -31,10 +31,10 @@ final class HtmlFormat
      * @return null|string
      */
     public static function inline(
-            null | string | \Stringable $string,
-    ) : ?string
-    {
-        return $string ? \ucfirst( escapeHtml( $string ) ) : null;
+        null | string | \Stringable $string,
+    ) : ?string {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
+        return $string ? \ucfirst(escapeHtml($string)) : null;
     }
 
     /**
@@ -45,9 +45,9 @@ final class HtmlFormat
      * @return null|string
      */
     public static function content(
-            null | string | \Stringable $string,
-    ) : ?string
-    {
-        return $string ? \ucfirst( escapeHtml( $string ) ) : null;
+        null | string | \Stringable $string,
+    ) : ?string {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
+        return $string ? \ucfirst(escapeHtml($string)) : null;
     }
 }

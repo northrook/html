@@ -9,20 +9,24 @@ class HtmlFormatter implements \Stringable
 {
     public function __construct(
         protected string $string,
-    ) {}
+    ) {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');}
 
     final public function newline( Newline $strategy = Newline::Auto ) : HtmlFormatter {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         $this->string = Format::newline( $this->string, $strategy );
         return $this;
     }
 
     final public function getString() : string {
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         return $this->string;
     }
 
 
     final public function backtickTags( array $attributes = [] ) : HtmlFormatter {
         $this->string = Format::backtickCodeTags( $this->string, $attributes );
+        trigger_deprecation(__METHOD__, 'html', 'Deprected.');
         return $this;
     }
 
